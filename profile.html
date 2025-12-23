@@ -10,6 +10,63 @@
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
   <style>
+<!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+<script>
+  // Firebase Config
+  const firebaseConfig = {
+    apiKey: "AIzaSyAZZohvUQwCVCELZOF9sP_ISl7EPxP1p8E",
+    authDomain: "sindhisocial-cc8ad.firebaseapp.com",
+    projectId: "sindhisocial-cc8ad",
+    appId: "1:1059274290288:web:6c1d41f1aa657bd5e030b5"
+  };
+
+  // Initialize Firebase
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+  const db = firebase.firestore();
+
+  // SAVE PROFILE FUNCTION
+  window.function saveProfile() {
+    const bio = document.getElementById("bio").value;
+
+    const user = auth.currentUser;
+
+    if (!user) {
+      alert("User login ناهي");
+      return;
+    }
+
+    db.collection("profiles").doc(user.uid).set({
+      name: user.displayName,
+      email: user.email,
+      bio: bio,
+      updatedAt: new Date()
+    })
+    .then(() => {
+      alert("✅ بروفائيل محفوظ ٿي ويو");
+    })
+    .catch((error) => {
+      alert("❌ Error: " + error.message);
+    });
+  }
+
+  // LOAD BIO WHEN PAGE OPENS
+  auth.onAuthStateChanged((user) => {
+    if (user) {
+      db.collection("profiles").doc(user.uid).get()
+        .then((doc) => {
+          if (doc.exists) {
+            document.getElementById("bio").value = doc.data().bio || "";
+          }
+        });
+    }
+  });
+</script>
+
     body {
       font-family: Arial, sans-serif;
       background: #f2f2f2;
