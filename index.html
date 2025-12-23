@@ -87,7 +87,10 @@
     firebase.auth().signInWithPopup(provider)
       .then((result) => {
         alert("Welcome " + result.user.displayName);
-        window.location.href = "profile.html";
+        setTimeout(() => {
+  window.location.href = "profile.html";
+}, 800);
+
       })
       .catch((error) => {
         alert(error.message);
@@ -97,3 +100,4 @@
 
 </body>
 </html>
+
