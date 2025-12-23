@@ -2,43 +2,88 @@
 <html lang="sd">
 <head>
   <meta charset="UTF-8">
-  <title>Sindhi Social – Profile</title>
-  <link rel="stylesheet" href="style.css">
+  <title>My Profile</title>
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f2f2f2;
+      margin: 0;
+      padding: 30px;
+      text-align: center;
+    }
+
+    .card {
+      background: white;
+      max-width: 400px;
+      margin: auto;
+      padding: 25px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    img {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+    }
+
+    h2 {
+      margin-top: 15px;
+    }
+
+    button {
+      margin-top: 20px;
+      padding: 10px 25px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+  </style>
 </head>
 
 <body>
 
-  <!-- TOP TITLE -->
-  <header>
-    <h2 class="ajrak-title">سنڌي ثقافت – اجرڪ – محبت ❤️</h2>
-  </header>
+<div class="card">
+  <img id="userPhoto" src="">
+  <h2 id="userName">Loading...</h2>
+  <p>توھان ڪاميابي سان login ٿي ويا آھيو ❤️</p>
+<textarea id="bio" placeholder="پنهنجي باري ۾ لکو..."
+style="width:100%;height:80px;margin-top:15px;"></textarea>
 
-  <!-- PROFILE CARD -->
-  <div class="post-box profile-box">
+<button onclick="saveProfile()">بروفائيل ايڊٽ ڪريو</button>
 
-    <!-- PROFILE IMAGE -->
-    <div class="profile-img">
-      <img src="https://via.placeholder.com/150" alt="Profile Picture">
-    </div>
+  <button onclick="logout()">Logout</button>
+</div>
 
-    <h1>نالو هتي ايندو</h1>
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyAZZohvUQwCVCELZOF9sP_ISl7EPxP1p8E",
+    authDomain: "sindhisocial-cc8ad.firebaseapp.com",
+    projectId: "sindhisocial-cc8ad",
+    appId: "1:1059274290288:web:6c1d41f1aa657bd5e030b5"
+  };
 
-    <!-- BIO -->
-    <p class="bio">
-      هتي توھان پنهنجي باري ۾ لکي سگھو ٿا  
-      (مثال: مان سنڌي ٻولي، ثقافت ۽ ماڻهن سان محبت ڪيان ٿو)
-    </p>
+  firebase.initializeApp(firebaseConfig);
 
-    <!-- ACTION BUTTONS -->
-    <button>پروفائيل ايڊٽ ڪريو</button>
-    <button class="secondary-btn">تصوير پوسٽ ڪريو</button>
+  firebase.auth().onAuthStateChanged((user) => {
+    if (user) {
+      document.getElementById("userName").innerText = user.displayName;
+      document.getElementById("userPhoto").src = user.photoURL;
+    } else {
+      window.location.href = "index.html";
+    }
+  });
 
-  </div>
-
-  <!-- FOOTER -->
-  <footer>
-    سنڌي سوشل نيٽ ورڪ © 2025
-  </footer>
+  function logout() {
+    firebase.auth().signOut().then(() => {
+      window.location.href = "index.html";
+    });
+  }
+</script>
 
 </body>
 </html>
