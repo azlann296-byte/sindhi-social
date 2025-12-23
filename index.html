@@ -8,6 +8,27 @@
   <!-- CSS -->
   <link rel="stylesheet" href="style.css">
 </head>
+<!-- باقي پيج جو HTML هتي هوندو -->
+
+<button onclick="googleLogin()">Login with Google</button>
+
+<!-- 🔴 هتي paste ڪريو -->
+<script>
+  function googleLogin() {
+    const provider = new firebase.auth.GoogleAuthProvider();
+
+    firebase.auth().signInWithPopup(provider)
+      .then((result) => {
+        window.location.href = "profile.html";
+      })
+      .catch((error) => {
+        alert(error.message);
+      });
+  }
+</script>
+
+</body>
+</html>
 
 <body>
 
@@ -90,3 +111,4 @@
 
 </body>
 </html>
+
