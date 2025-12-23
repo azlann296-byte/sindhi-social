@@ -3,22 +3,90 @@
 <head>
   <meta charset="UTF-8">
   <title>Sindhi Lovers</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <!-- CSS -->
-  <link rel="stylesheet" href="style.css">
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: url("ajrak.jpg") no-repeat center center fixed;
+      background-size: cover;
+      color: white;
+    }
+
+    .overlay {
+      background: rgba(0,0,0,0.6);
+      min-height: 100vh;
+      padding: 40px;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 48px;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+
+    h2 {
+      font-size: 28px;
+      font-weight: bold;
+    }
+
+    p {
+      font-size: 20px;
+      font-weight: bold;
+    }
+
+    .btn {
+      margin-top: 30px;
+      padding: 12px 25px;
+      font-size: 18px;
+      font-weight: bold;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      background: white;
+      color: black;
+    }
+
+    .btn:hover {
+      background: #ddd;
+    }
+  </style>
 </head>
-<!-- باقي پيج جو HTML هتي هوندو -->
 
-<button onclick="googleLogin()">Login with Google</button>
+<body>
 
-<!-- 🔴 هتي paste ڪريو -->
+<div class="overlay">
+  <h1>سنڌي ثقافت – اجرڪ – محبت ❤️</h1>
+  <h2>❤️ Sindhi Lovers</h2>
+  <p>سنڌي ماڻهن لاءِ سوشل ڪميونٽي</p>
+
+  <button class="btn" onclick="googleLogin()">Login with Google</button>
+</div>
+
+<!-- Firebase Config -->
 <script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyAZZohvUQwCVCELZOF9sP_ISl7EPxP1p8E",
+    authDomain: "sindhisocial-cc8ad.firebaseapp.com",
+    projectId: "sindhisocial-cc8ad",
+    storageBucket: "sindhisocial-cc8ad.appspot.com",
+    messagingSenderId: "1059274290288",
+    appId: "1:1059274290288:web:6c1d41f1aa657bd5e030b5"
+  };
+
+  firebase.initializeApp(firebaseConfig);
+
   function googleLogin() {
     const provider = new firebase.auth.GoogleAuthProvider();
 
     firebase.auth().signInWithPopup(provider)
       .then((result) => {
+        alert("Welcome " + result.user.displayName);
         window.location.href = "profile.html";
       })
       .catch((error) => {
@@ -29,86 +97,3 @@
 
 </body>
 </html>
-
-<body>
-
-  <!-- HEADER -->
-  <header class="header">
-    <h1 class="title">❤️ Sindhi Lovers</h1>
-    <p class="subtitle">سنڌي ماڻهن لاءِ سوشل ڪميونٽي</p>
-
-    <!-- Google Login Button -->
-    <button onclick="googleLogin()" class="google-btn">
-      Login with Google
-    </button>
-
-    <button onclick="logout()" class="logout-btn">
-      Logout
-    </button>
-  </header>
-
-  <!-- POST BOX -->
-  <section class="post-box">
-    <h2>اڄ ڇا شيئر ڪرڻ چاهيو ٿا؟</h2>
-    <textarea placeholder="پنهنجا خيال هتي لکو..."></textarea>
-    <button class="post-btn">Post</button>
-  </section>
-
-  <!-- POSTS -->
-  <section class="posts">
-
-    <div class="post">
-      <h3>نظام نور ڪاڪا</h3>
-      <p>سنڌي ٻولي اسان جي سڃاڻپ آهي ❤️</p>
-      <div class="actions">
-        ❤️ Like &nbsp; 💬 Comment
-      </div>
-    </div>
-
-    <div class="post">
-      <h3>سنڌي دوست</h3>
-      <p>اڄ سنڌ تمام خوبصورت لڳي رهي آهي 🌸</p>
-      <div class="actions">
-        ❤️ Like &nbsp; 💬 Comment
-      </div>
-    </div>
-
-  </section>
-
-  <!-- FIREBASE -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getAuth, GoogleAuthProvider, signInWithPopup, signOut } 
-      from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-
-    const firebaseConfig = {
-      apiKey: "AIzaSyAZZohvUQwCVCELZOF9sP_ISl7EPxP1p8E",
-      authDomain: "sindhisocial-cc8ad.firebaseapp.com",
-      projectId: "sindhisocial-cc8ad",
-      storageBucket: "sindhisocial-cc8ad.firebasestorage.app",
-      messagingSenderId: "1059274290288",
-      appId: "1:1059274290288:web:6c1d41f1aa657bd5e030b5"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const provider = new GoogleAuthProvider();
-
-    window.googleLogin = async function () {
-      try {
-        const result = await signInWithPopup(auth, provider);
-        alert("Welcome " + result.user.displayName);
-      } catch (error) {
-        alert(error.message);
-      }
-    };
-
-    window.logout = async function () {
-      await signOut(auth);
-      alert("Logged out");
-    };
-  </script>
-
-</body>
-</html>
-
