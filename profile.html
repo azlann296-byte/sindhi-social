@@ -2,123 +2,76 @@
 <html lang="sd">
 <head>
   <meta charset="UTF-8">
-  <title>Sindhi Social – Profile</title>
-
-  <!-- Firebase SDKs -->
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <title>Profile | Sindhi Social</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <style>
-<!-- Firebase SDKs -->
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-
-<script>
-  // Firebase Config
-  const firebaseConfig = {
-    apiKey: "AIzaSyAZZohvUQwCVCELZOF9sP_ISl7EPxP1p8E",
-    authDomain: "sindhisocial-cc8ad.firebaseapp.com",
-    projectId: "sindhisocial-cc8ad",
-    appId: "1:1059274290288:web:6c1d41f1aa657bd5e030b5"
-  };
-
-  // Initialize Firebase
-  firebase.initializeApp(firebaseConfig);
-  const auth = firebase.auth();
-  const db = firebase.firestore();
-
-  // SAVE PROFILE FUNCTION
-  window.function saveProfile() {
-    const bio = document.getElementById("bio").value;
-
-    const user = auth.currentUser;
-
-    if (!user) {
-      alert("User login ناهي");
-      return;
-    }
-
-    db.collection("profiles").doc(user.uid).set({
-      name: user.displayName,
-      email: user.email,
-      bio: bio,
-      updatedAt: new Date()
-    })
-    .then(() => {
-      alert("✅ بروفائيل محفوظ ٿي ويو");
-    })
-    .catch((error) => {
-      alert("❌ Error: " + error.message);
-    });
-  }
-
-  // LOAD BIO WHEN PAGE OPENS
-  auth.onAuthStateChanged((user) => {
-    if (user) {
-      db.collection("profiles").doc(user.uid).get()
-        .then((doc) => {
-          if (doc.exists) {
-            document.getElementById("bio").value = doc.data().bio || "";
-          }
-        });
-    }
-  });
-</script>
-
     body {
       font-family: Arial, sans-serif;
-      background: #f2f2f2;
-      margin: 0;
-      padding: 0;
+      background: #f5f5f5;
+      padding: 15px;
     }
-    .container {
-      max-width: 400px;
-      margin: 30px auto;
-      background: #fff;
-      padding: 20px;
+    .card {
+      background: white;
+      padding: 15px;
       border-radius: 10px;
-      text-align: center;
-    }
-    img {
-      width: 100px;
-      height: 100px;
-      border-radius: 50%;
-    }
-    textarea {
-      width: 100%;
-      height: 80px;
-      margin-top: 15px;
-      padding: 8px;
+      margin-bottom: 15px;
     }
     button {
-      width: 100%;
-      padding: 10px;
-      margin-top: 15px;
-      background: #e91e63;
+      padding: 8px 15px;
+      background: #c2185b;
       color: white;
       border: none;
       border-radius: 5px;
       cursor: pointer;
     }
-    button:hover {
-      background: #c2185b;
+    img {
+      max-width: 100%;
+      border-radius: 10px;
     }
   </style>
 </head>
 
 <body>
 
-  <div class="container">
-    <img id="userPhoto" src="">
-    <h3 id="userName">نالو هتي ايندو</h3>
+  <!-- PROFILE CARD -->
+  <div class="card" style="text-align:center;">
+    <img id="profilePic" src="https://via.placeholder.com/120"
+      style="width:120px;height:120px;border-radius:50%;object-fit:cover;"><br><br>
 
-    <textarea id="bio" placeholder="پنهنجي باري ۾ لکو..."></textarea>
+    <input type="file" id="photoInput" accept="image/*"><br><br>
+    <button onclick="uploadPhoto()">تصوير اپلوڊ ڪريو</button>
+
+    <hr>
+
+    <h3 id="userName">نالو</h3>
+
+    <textarea id="bio" placeholder="پنهنجي باري ۾ لکو..."
+      style="width:100%;height:80px;"></textarea><br><br>
 
     <button onclick="saveProfile()">بروفائيل ايڊٽ ڪريو</button>
-    <button onclick="logout()">Logout</button>
   </div>
+
+  <!-- POST CREATE -->
+  <div class="card">
+    <h3>اڄ ڇا شيئر ڪرڻ چاهيو ٿا؟</h3>
+
+    <textarea id="postText" placeholder="هتي لکو..."
+      style="width:100%;height:80px;"></textarea><br><br>
+
+    <input type="file" id="postImage" accept="image/*"><br><br>
+
+    <button onclick="createPost()">Post</button>
+  </div>
+
+  <!-- POSTS -->
+  <div id="posts"></div>
+
+  <!-- FIREBASE SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
 
   <script>
     // Firebase Config
@@ -133,47 +86,105 @@
 
     const auth = firebase.auth();
     const db = firebase.firestore();
+    const storage = firebase.storage();
 
-    // Save Profile
-    function saveProfile() {
+    // SAVE PROFILE
+    window.saveProfile = function () {
+      const bio = document.getElementById("bio").value;
       const user = auth.currentUser;
-      const bioText = document.getElementById("bio").value;
 
+      if (!user) return alert("Login ناهي");
+
+      db.collection("profiles").doc(user.uid).set({
+        name: user.displayName,
+        email: user.email,
+        bio: bio
+      }).then(() => {
+        alert("✅ بروفائيل محفوظ ٿي ويو");
+      });
+    };
+
+    // UPLOAD PHOTO
+    window.uploadPhoto = function () {
+      const file = document.getElementById("photoInput").files[0];
+      const user = auth.currentUser;
+      if (!file || !user) return;
+
+      const ref = storage.ref("profilePics/" + user.uid);
+      ref.put(file)
+        .then(() => ref.getDownloadURL())
+        .then((url) => {
+          document.getElementById("profilePic").src = url;
+          return db.collection("profiles").doc(user.uid).update({
+            photoURL: url
+          });
+        })
+        .then(() => alert("✅ تصوير محفوظ ٿي وئي"));
+    };
+
+    // CREATE POST
+    window.createPost = function () {
+      const text = document.getElementById("postText").value;
+      const file = document.getElementById("postImage").files[0];
+      const user = auth.currentUser;
       if (!user) return;
 
-      db.collection("users").doc(user.uid).set({
+      const postRef = db.collection("posts").doc();
+
+      if (file) {
+        const imgRef = storage.ref("posts/" + postRef.id);
+        imgRef.put(file)
+          .then(() => imgRef.getDownloadURL())
+          .then((url) => savePost(text, url, postRef, user));
+      } else {
+        savePost(text, "", postRef, user);
+      }
+    };
+
+    function savePost(text, image, ref, user) {
+      ref.set({
+        text: text,
+        image: image,
         name: user.displayName,
-        photo: user.photoURL,
-        bio: bioText
+        time: new Date()
       }).then(() => {
-        alert("Profile saved ❤️");
-      }).catch((error) => {
-        alert(error.message);
+        document.getElementById("postText").value = "";
+        document.getElementById("postImage").value = "";
+        loadPosts();
       });
     }
 
-    // Load Profile
+    function loadPosts() {
+      db.collection("posts").orderBy("time", "desc").get()
+        .then((snap) => {
+          let html = "";
+          snap.forEach(doc => {
+            const p = doc.data();
+            html += `
+              <div class="card">
+                <b>${p.name}</b>
+                <p>${p.text}</p>
+                ${p.image ? `<img src="${p.image}">` : ""}
+              </div>
+            `;
+          });
+          document.getElementById("posts").innerHTML = html;
+        });
+    }
+
     auth.onAuthStateChanged((user) => {
       if (user) {
         document.getElementById("userName").innerText = user.displayName;
-        document.getElementById("userPhoto").src = user.photoURL;
-
-        db.collection("users").doc(user.uid).get().then((doc) => {
+        db.collection("profiles").doc(user.uid).get().then(doc => {
           if (doc.exists) {
             document.getElementById("bio").value = doc.data().bio || "";
+            if (doc.data().photoURL)
+              document.getElementById("profilePic").src = doc.data().photoURL;
           }
         });
-      } else {
-        window.location.href = "index.html";
+        loadPosts();
       }
     });
-
-    // Logout
-    function logout() {
-      auth.signOut().then(() => {
-        window.location.href = "index.html";
-      });
-    }
   </script>
 
 </body>
