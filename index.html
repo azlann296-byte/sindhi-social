@@ -1,103 +1,185 @@
 <!DOCTYPE html>
-<html lang="sd">
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Sindhi Lovers</title>
+<meta charset="UTF-8">
+<title>My Social Profile</title>
 
-  <!-- Firebase SDKs -->
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<style>
+body {
+  margin: 0;
+  background: #f0f2f5;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto;
+}
 
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: url("ajrak.jpg") no-repeat center center fixed;
-      background-size: cover;
-      color: white;
-    }
+.container {
+  max-width: 500px;
+  margin: auto;
+  padding: 15px;
+}
 
-    .overlay {
-      background: rgba(0,0,0,0.6);
-      min-height: 100vh;
-      padding: 40px;
-      text-align: center;
-    }
+.card {
+  background: #ffffff;
+  border-radius: 10px;
+  padding: 15px;
+  margin-bottom: 15px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.15);
+}
 
-    h1 {
-      font-size: 48px;
-      font-weight: bold;
-      margin-bottom: 10px;
-    }
+.profile-header {
+  text-align: center;
+}
 
-    h2 {
-      font-size: 28px;
-      font-weight: bold;
-    }
+.profile-header img {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  border: 4px solid #1877f2;
+  object-fit: cover;
+}
 
-    p {
-      font-size: 20px;
-      font-weight: bold;
-    }
+.profile-header h2 {
+  margin: 10px 0 5px;
+}
 
-    .btn {
-      margin-top: 30px;
-      padding: 12px 25px;
-      font-size: 18px;
-      font-weight: bold;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      background: white;
-      color: black;
-    }
+input[type="file"] {
+  margin-top: 10px;
+}
 
-    .btn:hover {
-      background: #ddd;
-    }
-  </style>
+textarea, input[type="text"] {
+  width: 100%;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 10px;
+  font-size: 14px;
+  margin-top: 8px;
+}
+
+button {
+  width: 100%;
+  background: #1877f2;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 10px;
+  font-size: 15px;
+  margin-top: 10px;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #166fe5;
+}
+
+.post {
+  margin-top: 10px;
+}
+
+.post-name {
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.post-time {
+  font-size: 12px;
+  color: gray;
+  margin-bottom: 5px;
+}
+</style>
 </head>
 
 <body>
 
-<div class="overlay">
-  <h1>سنڌي ثقافت – اجرڪ – محبت ❤️</h1>
-  <h2>❤️ Sindhi Lovers</h2>
-  <p>سنڌي ماڻهن لاءِ سوشل ڪميونٽي</p>
+<div class="container">
 
-  <button class="btn" onclick="googleLogin()">Login with Google</button>
+  <!-- PROFILE CARD -->
+  <div class="card profile-header">
+    <img id="profilePic" src="">
+    <input type="file" id="imageInput">
+    <input type="text" id="userName" placeholder="Your Name">
+    <textarea id="bio" placeholder="Write about yourself..."></textarea>
+    <button onclick="saveProfile()">Update Profile</button>
+  </div>
+
+  <!-- CREATE POST -->
+  <div class="card">
+    <textarea id="postText" placeholder="اڄ ڇا شيئر ڪرڻ چاهيو ٿا؟"></textarea>
+    <button onclick="createPost()">Post</button>
+  </div>
+
+  <!-- POSTS -->
+  <div id="posts"></div>
+
 </div>
 
-<!-- Firebase Config -->
 <script>
-  const firebaseConfig = {
-    apiKey: "AIzaSyAZZohvUQwCVCELZOF9sP_ISl7EPxP1p8E",
-    authDomain: "sindhisocial-cc8ad.firebaseapp.com",
-    projectId: "sindhisocial-cc8ad",
-    storageBucket: "sindhisocial-cc8ad.appspot.com",
-    messagingSenderId: "1059274290288",
-    appId: "1:1059274290288:web:6c1d41f1aa657bd5e030b5"
+const profilePic = document.getElementById("profilePic");
+const imageInput = document.getElementById("imageInput");
+const userNameInput = document.getElementById("userName");
+const bioInput = document.getElementById("bio");
+const postsDiv = document.getElementById("posts");
+
+/* LOAD SAVED DATA */
+window.onload = () => {
+  profilePic.src = localStorage.getItem("profilePic") || "";
+  userNameInput.value = localStorage.getItem("userName") || "";
+  bioInput.value = localStorage.getItem("bio") || "";
+  loadPosts();
+};
+
+/* PROFILE IMAGE UPLOAD */
+imageInput.addEventListener("change", () => {
+  const file = imageInput.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = () => {
+    profilePic.src = reader.result;
+    localStorage.setItem("profilePic", reader.result);
   };
+  reader.readAsDataURL(file);
+});
 
-  firebase.initializeApp(firebaseConfig);
+/* SAVE PROFILE */
+function saveProfile() {
+  localStorage.setItem("userName", userNameInput.value);
+  localStorage.setItem("bio", bioInput.value);
+  alert("Profile Updated");
+}
 
-  function googleLogin() {
-    const provider = new firebase.auth.GoogleAuthProvider();
+/* CREATE POST */
+function createPost() {
+  const text = document.getElementById("postText").value;
+  if (text === "") return;
 
-    firebase.auth().signInWithPopup(provider)
-      .then((result) => {
-        alert("Welcome " + result.user.displayName);
-        setTimeout(() => {
-  window.location.href = "profile.html";
-}, 800);
+  const posts = JSON.parse(localStorage.getItem("posts") || "[]");
 
-      })
-      .catch((error) => {
-        alert(error.message);
-      });
-  }
+  posts.unshift({
+    name: userNameInput.value || "User",
+    text: text,
+    time: new Date().toLocaleString()
+  });
+
+  localStorage.setItem("posts", JSON.stringify(posts));
+  document.getElementById("postText").value = "";
+  loadPosts();
+}
+
+/* LOAD POSTS */
+function loadPosts() {
+  postsDiv.innerHTML = "";
+  const posts = JSON.parse(localStorage.getItem("posts") || "[]");
+
+  posts.forEach(post => {
+    postsDiv.innerHTML += `
+      <div class="card post">
+        <div class="post-name">${post.name}</div>
+        <div class="post-time">${post.time}</div>
+        <div>${post.text}</div>
+      </div>
+    `;
+  });
+}
 </script>
 
 </body>
 </html>
-
