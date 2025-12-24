@@ -101,7 +101,8 @@
     const file = document.getElementById("imageInput").files[0];
 
     if (file) {
-      const ref = storage.ref("profiles/" + user.uid);
+      const ref = storage.ref("profiles/" + user.uid + "_" + Date.now());
+
       ref.put(file).then(() => {
         ref.getDownloadURL().then(url => {
           db.collection("users").doc(user.uid).set({
@@ -167,3 +168,4 @@
 
 </body>
 </html>
+
