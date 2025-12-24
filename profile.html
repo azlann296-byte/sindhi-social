@@ -2,190 +2,168 @@
 <html lang="sd">
 <head>
   <meta charset="UTF-8">
-  <title>Profile | Sindhi Social</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Profile</title>
+
+  <!-- Firebase CDN -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
 
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background: #f5f5f5;
-      padding: 15px;
+      font-family: Arial;
+      background: #f4f4f4;
+      padding: 20px;
     }
     .card {
-      background: white;
+      background: #fff;
       padding: 15px;
       border-radius: 10px;
-      margin-bottom: 15px;
-    }
-    button {
-      padding: 8px 15px;
-      background: #c2185b;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
+      max-width: 400px;
+      margin: auto;
     }
     img {
-      max-width: 100%;
-      border-radius: 10px;
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+    textarea, input {
+      width: 100%;
+      margin-top: 10px;
+      padding: 8px;
+    }
+    button {
+      margin-top: 10px;
+      padding: 10px;
+      width: 100%;
+      background: green;
+      color: white;
+      border: none;
+      cursor: pointer;
     }
   </style>
 </head>
 
 <body>
 
-  <!-- PROFILE CARD -->
-  <div class="card" style="text-align:center;">
-    <img id="profilePic" src="https://via.placeholder.com/120"
-      style="width:120px;height:120px;border-radius:50%;object-fit:cover;"><br><br>
+<div class="card">
+  <h3>Profile Picture</h3>
+  <img id="profilePic" src="" alt="Profile">
+  <input type="file" id="imageInput">
 
-    <input type="file" id="photoInput" accept="image/*"><br><br>
-    <button onclick="uploadPhoto()">تصوير اپلوڊ ڪريو</button>
+  <h3 id="userName">نالو هتي ايندو</h3>
 
-    <hr>
+  <textarea id="bio" placeholder="پنهنجي باري ۾ لکو..."></textarea>
+  <button onclick="saveProfile()">بروفائيل ايڊٽ ڪريو</button>
 
-    <h3 id="userName">نالو</h3>
+  <hr>
 
-    <textarea id="bio" placeholder="پنهنجي باري ۾ لکو..."
-      style="width:100%;height:80px;"></textarea><br><br>
+  <h3>اڄ ڇا شيئر ڪرڻ چاهيو ٿا؟</h3>
+  <textarea id="postText" placeholder="هتي لکو..."></textarea>
+  <button onclick="createPost()">Post ڪريو</button>
 
-    <button onclick="saveProfile()">بروفائيل ايڊٽ ڪريو</button>
-  </div>
-
-  <!-- POST CREATE -->
-  <div class="card">
-    <h3>اڄ ڇا شيئر ڪرڻ چاهيو ٿا؟</h3>
-
-    <textarea id="postText" placeholder="هتي لکو..."
-      style="width:100%;height:80px;"></textarea><br><br>
-
-    <input type="file" id="postImage" accept="image/*"><br><br>
-
-    <button onclick="createPost()">Post</button>
-  </div>
-
-  <!-- POSTS -->
   <div id="posts"></div>
+</div>
 
-  <!-- FIREBASE SDKs -->
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
+<script>
+  // 🔥 Firebase Config
+  const firebaseConfig = {
+    apiKey: "AIzaSyAZZohvUQwCVCELZOF9sP_ISl7EPxP1p8E",
+    authDomain: "sindhisocial-cc8ad.firebaseapp.com",
+    projectId: "sindhisocial-cc8ad",
+    storageBucket: "sindhisocial-cc8ad.appspot.com",
+    appId: "1:1059274290288:web:6c1d41f1aa657bd5e030b5"
+  };
 
-  <script>
-    // Firebase Config
-    const firebaseConfig = {
-      apiKey: "AIzaSyAZZohvUQwCVCELZOF9sP_ISl7EPxP1p8E",
-      authDomain: "sindhisocial-cc8ad.firebaseapp.com",
-      projectId: "sindhisocial-cc8ad",
-      appId: "1:1059274290288:web:6c1d41f1aa657bd5e030b5"
-    };
+  firebase.initializeApp(firebaseConfig);
 
-    firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+  const db = firebase.firestore();
+  const storage = firebase.storage();
 
-    const auth = firebase.auth();
-    const db = firebase.firestore();
-    const storage = firebase.storage();
+  // 👤 Load user
+  auth.onAuthStateChanged(user => {
+    if (!user) {
+      window.location.href = "index.html";
+    } else {
+      document.getElementById("userName").innerText = user.displayName;
+      loadProfile(user.uid);
+      loadPosts();
+    }
+  });
 
-    // SAVE PROFILE
-    window.saveProfile = function () {
-      const bio = document.getElementById("bio").value;
-      const user = auth.currentUser;
+  // 💾 Save Bio + Image
+  function saveProfile() {
+    const user = auth.currentUser;
+    const bio = document.getElementById("bio").value;
+    const file = document.getElementById("imageInput").files[0];
 
-      if (!user) return alert("Login ناهي");
-
-      db.collection("profiles").doc(user.uid).set({
-        name: user.displayName,
-        email: user.email,
-        bio: bio
-      }).then(() => {
-        alert("✅ بروفائيل محفوظ ٿي ويو");
-      });
-    };
-
-    // UPLOAD PHOTO
-    window.uploadPhoto = function () {
-      const file = document.getElementById("photoInput").files[0];
-      const user = auth.currentUser;
-      if (!file || !user) return;
-
-      const ref = storage.ref("profilePics/" + user.uid);
-      ref.put(file)
-        .then(() => ref.getDownloadURL())
-        .then((url) => {
+    if (file) {
+      const ref = storage.ref("profiles/" + user.uid);
+      ref.put(file).then(() => {
+        ref.getDownloadURL().then(url => {
+          db.collection("users").doc(user.uid).set({
+            bio: bio,
+            photo: url
+          });
           document.getElementById("profilePic").src = url;
-          return db.collection("profiles").doc(user.uid).update({
-            photoURL: url
-          });
-        })
-        .then(() => alert("✅ تصوير محفوظ ٿي وئي"));
-    };
-
-    // CREATE POST
-    window.createPost = function () {
-      const text = document.getElementById("postText").value;
-      const file = document.getElementById("postImage").files[0];
-      const user = auth.currentUser;
-      if (!user) return;
-
-      const postRef = db.collection("posts").doc();
-
-      if (file) {
-        const imgRef = storage.ref("posts/" + postRef.id);
-        imgRef.put(file)
-          .then(() => imgRef.getDownloadURL())
-          .then((url) => savePost(text, url, postRef, user));
-      } else {
-        savePost(text, "", postRef, user);
-      }
-    };
-
-    function savePost(text, image, ref, user) {
-      ref.set({
-        text: text,
-        image: image,
-        name: user.displayName,
-        time: new Date()
-      }).then(() => {
-        document.getElementById("postText").value = "";
-        document.getElementById("postImage").value = "";
-        loadPosts();
+          alert("Profile Updated ✔️");
+        });
       });
+    } else {
+      db.collection("users").doc(user.uid).update({ bio: bio });
+      alert("Bio Saved ✔️");
     }
+  }
 
-    function loadPosts() {
-      db.collection("posts").orderBy("time", "desc").get()
-        .then((snap) => {
-          let html = "";
-          snap.forEach(doc => {
-            const p = doc.data();
-            html += `
-              <div class="card">
-                <b>${p.name}</b>
-                <p>${p.text}</p>
-                ${p.image ? `<img src="${p.image}">` : ""}
-              </div>
-            `;
-          });
-          document.getElementById("posts").innerHTML = html;
-        });
-    }
-
-    auth.onAuthStateChanged((user) => {
-      if (user) {
-        document.getElementById("userName").innerText = user.displayName;
-        db.collection("profiles").doc(user.uid).get().then(doc => {
-          if (doc.exists) {
-            document.getElementById("bio").value = doc.data().bio || "";
-            if (doc.data().photoURL)
-              document.getElementById("profilePic").src = doc.data().photoURL;
-          }
-        });
-        loadPosts();
+  // 📥 Load Profile
+  function loadProfile(uid) {
+    db.collection("users").doc(uid).get().then(doc => {
+      if (doc.exists) {
+        document.getElementById("bio").value = doc.data().bio || "";
+        if (doc.data().photo) {
+          document.getElementById("profilePic").src = doc.data().photo;
+        }
       }
     });
-  </script>
+  }
+
+  // 📝 Create Post
+  function createPost() {
+    const text = document.getElementById("postText").value;
+    const user = auth.currentUser;
+
+    if (text === "") {
+      alert("ڪجهه لکو");
+      return;
+    }
+
+    db.collection("posts").add({
+      text: text,
+      name: user.displayName,
+      time: firebase.firestore.FieldValue.serverTimestamp()
+    });
+
+    document.getElementById("postText").value = "";
+    loadPosts();
+  }
+
+  // 📃 Load Posts
+  function loadPosts() {
+    const postsDiv = document.getElementById("posts");
+    postsDiv.innerHTML = "";
+
+    db.collection("posts").orderBy("time", "desc").get().then(snapshot => {
+      snapshot.forEach(doc => {
+        postsDiv.innerHTML += `
+          <p><b>${doc.data().name}</b><br>${doc.data().text}</p><hr>
+        `;
+      });
+    });
+  }
+</script>
 
 </body>
 </html>
