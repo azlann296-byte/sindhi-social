@@ -182,4 +182,28 @@ function loadPosts() {
 </script>
 
 </body>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Loading...</title>
+</head>
+<body>
+
+<h3 style="text-align:center;margin-top:50px;">
+  Please wait...
+</h3>
+
+<script>
+  if (localStorage.getItem("loggedIn") === "yes") {
+    window.location.href = "profile.html";
+  } else {
+    window.location.href = "login.html";
+  }
+</script>
+
+</body>
 </html>
+
+</html>
+
