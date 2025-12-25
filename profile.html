@@ -47,7 +47,8 @@
 </head>
 <script>
   const profilePic = document.getElementById("profilePic");
-  const imageInput = document.getElementById("imageInput");
+  const imageInput = document.getElementById("imageInput").files[0]
+
 
   // Click image → open file picker
   profilePic.onclick = () => imageInput.click();
@@ -231,6 +232,7 @@ function saveProfile() {
 
 </body>
 </html>
+
 
 
 
