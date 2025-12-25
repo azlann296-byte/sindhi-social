@@ -45,6 +45,25 @@
     }
   </style>
 </head>
+<script>
+  const profilePic = document.getElementById("profilePic");
+  const imageInput = document.getElementById("imageInput");
+
+  // Click image → open file picker
+  profilePic.onclick = () => imageInput.click();
+
+  // Preview image
+  imageInput.onchange = () => {
+    const file = imageInput.files[0];
+    if (file) {
+      profilePic.src = URL.createObjectURL(file);
+    }
+  };
+
+  function saveProfile() {
+    alert("Profile updated successfully!");
+  }
+</script>
 
 <body>
 
@@ -201,5 +220,6 @@ function saveProfile() {
 
 </body>
 </html>
+
 
 
