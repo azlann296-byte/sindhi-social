@@ -92,13 +92,21 @@ button:hover {
 <div class="container">
 
   <!-- PROFILE CARD -->
-  <div class="card profile-header">
-    <img id="profilePic" src="">
-    <input type="file" id="imageInput">
-    <input type="text" id="userName" placeholder="Your Name">
-    <textarea id="bio" placeholder="Write about yourself..."></textarea>
-    <button onclick="saveProfile()">Update Profile</button>
-  </div>
+ <!-- PROFILE CARD -->
+<div class="card profile-header">
+
+  <!-- Profile Image -->
+  <img id="profilePic" src="images/default.png" alt="Profile Picture">
+
+  <!-- Hidden File Input -->
+  <input type="file" id="imageInput" accept="image/*" hidden>
+
+  <!-- Name & Bio -->
+  <input type="text" id="userName" placeholder="Your Name">
+  <textarea id="bio" placeholder="Write about yourself..."></textarea>
+
+  <button onclick="saveProfile()">Update Profile</button>
+</div>
 
   <!-- CREATE POST -->
   <div class="card">
@@ -200,5 +208,6 @@ function loadPosts() {
 </html>
 
 </html>
+
 
 
