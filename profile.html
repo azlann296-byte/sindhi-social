@@ -67,15 +67,26 @@
 
 <body>
 
-<div class="card">
-  <h3>Profile Picture</h3>
-  <img id="profilePic" src="" alt="Profile">
-  <input type="file" id="imageInput">
+<!-- PROFILE CARD -->
+<div class="card profile-header">
 
-  <h3 id="userName">نالو هتي ايندو</h3>
+  <!-- Clickable profile image -->
+  <img
+    id="profilePic"
+    src="default.png"
+    onclick="document.getElementById('imageInput').click()"
+  >
 
-  <textarea id="bio" placeholder="پنهنجي باري ۾ لکو..."></textarea>
-  <button onclick="saveProfile()">بروفائيل ايڊٽ ڪريو</button>
+  <!-- Hidden file input -->
+  <input type="file" id="imageInput" hidden>
+
+  <input type="text" id="userName" placeholder="Your Name">
+
+  <textarea id="bio" placeholder="Write about yourself..."></textarea>
+
+  <button onclick="saveProfile()">Update Profile</button>
+
+</div>
 
   <hr>
 
@@ -220,6 +231,7 @@ function saveProfile() {
 
 </body>
 </html>
+
 
 
 
