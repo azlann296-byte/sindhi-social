@@ -22,6 +22,15 @@ header {
   max-width: 400px;
   margin: 50px auto;
   border-radius: 10px;
+.profile-header img {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  cursor: pointer;
+  border: 3px solid #1877f2;
+  margin-bottom: 10px;
+}
 
 }
 
@@ -208,3 +217,4 @@ nav a {
 nav a:hover {
   text-decoration: underline;
 }
+
