@@ -71,14 +71,8 @@
 <!-- PROFILE CARD -->
 <div class="card profile-header">
 
-  <!-- Clickable profile image -->
-  <img
-    id="profilePic"
-    src="default.png"
-    onclick="document.getElementById('imageInput').click()"
-  >
+  <img id="profilePic" src="default.png">
 
-  <!-- Hidden file input -->
   <input type="file" id="imageInput" hidden>
 
   <input type="text" id="userName" placeholder="Your Name">
@@ -86,6 +80,9 @@
   <textarea id="bio" placeholder="Write about yourself..."></textarea>
 
   <button onclick="saveProfile()">Update Profile</button>
+
+</div>
+
 
 </div>
 
@@ -232,6 +229,7 @@ function saveProfile() {
 
 </body>
 </html>
+
 
 
 
