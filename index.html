@@ -1,232 +1,18 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<title>My Social Profile</title>
-
-<style>
-body {
-  margin: 0;
-  background: #f0f2f5;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto;
-}
-
-.container {
-  max-width: 500px;
-  margin: auto;
-  padding: 15px;
-}
-
-.card {
-  background: #ffffff;
-  border-radius: 10px;
-  padding: 15px;
-  margin-bottom: 15px;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.15);
-}
-
-.profile-header {
-  text-align: center;
-}
-
-.profile-header img {
-  width: 120px;
-  height: 120px;
-  border-radius: 50%;
-  border: 4px solid #1877f2;
-  object-fit: cover;
-}
-
-.profile-header h2 {
-  margin: 10px 0 5px;
-}
-
-input[type="file"] {
-  margin-top: 10px;
-}
-
-textarea, input[type="text"] {
-  width: 100%;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  padding: 10px;
-  font-size: 14px;
-  margin-top: 8px;
-}
-
-button {
-  width: 100%;
-  background: #1877f2;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  padding: 10px;
-  font-size: 15px;
-  margin-top: 10px;
-  cursor: pointer;
-}
-
-button:hover {
-  background: #166fe5;
-}
-
-.post {
-  margin-top: 10px;
-}
-
-.post-name {
-  font-weight: bold;
-  margin-bottom: 5px;
-}
-
-.post-time {
-  font-size: 12px;
-  color: gray;
-  margin-bottom: 5px;
-}
-</style>
-</head>
-
-<body>
-
-<div class="container">
-
-  <!-- PROFILE CARD -->
- <!-- PROFILE CARD -->
-<div class="card profile-header">
-
-  <!-- Profile Image -->
-  <img id="profilePic" src="images/default.png" alt="Profile Picture">
-
-  <!-- Hidden File Input -->
-  <input type="file" id="imageInput" accept="image/*" hidden>
-
-  <!-- Name & Bio -->
-  <input type="text" id="userName" placeholder="Your Name">
-  <textarea id="bio" placeholder="Write about yourself..."></textarea>
-
-  <button onclick="saveProfile()">Update Profile</button>
-</div>
-
-  <!-- CREATE POST -->
-  <div class="card">
-    <textarea id="postText" placeholder="اڄ ڇا شيئر ڪرڻ چاهيو ٿا؟"></textarea>
-    <button onclick="createPost()">Post</button>
-  </div>
-
-  <!-- POSTS -->
-  <div id="posts"></div>
-
-</div>
-
-<script>
-const profilePic = document.getElementById("profilePic");
-const imageInput = document.getElementById("imageInput");
-const userNameInput = document.getElementById("userName");
-const bioInput = document.getElementById("bio");
-const postsDiv = document.getElementById("posts");
-
-/* LOAD SAVED DATA */
-window.onload = () => {
-  profilePic.src = localStorage.getItem("profilePic") || "";
-  userNameInput.value = localStorage.getItem("userName") || "";
-  bioInput.value = localStorage.getItem("bio") || "";
-  loadPosts();
-};
-
-/* PROFILE IMAGE UPLOAD */
-imageInput.addEventListener("change", () => {
-  const file = imageInput.files[0];
-  if (!file) return;
-
-  const reader = new FileReader();
-  reader.onload = () => {
-    profilePic.src = reader.result;
-    localStorage.setItem("profilePic", reader.result);
-  };
-  reader.readAsDataURL(file);
-});
-
-/* SAVE PROFILE */
-function saveProfile() {
-  localStorage.setItem("userName", userNameInput.value);
-  localStorage.setItem("bio", bioInput.value);
-  alert("Profile Updated");
-}
-
-/* CREATE POST */
-function createPost() {
-  const text = document.getElementById("postText").value;
-  if (text === "") return;
-
-  const posts = JSON.parse(localStorage.getItem("posts") || "[]");
-
-  posts.unshift({
-    name: userNameInput.value || "User",
-    text: text,
-    time: new Date().toLocaleString()
-  });
-
-  localStorage.setItem("posts", JSON.stringify(posts));
-  document.getElementById("postText").value = "";
-  loadPosts();
-}
-
-/* LOAD POSTS */
-function loadPosts() {
-  postsDiv.innerHTML = "";
-  const posts = JSON.parse(localStorage.getItem("posts") || "[]");
-
-  posts.forEach(post => {
-    postsDiv.innerHTML += `
-      <div class="card post">
-        <div class="post-name">${post.name}</div>
-        <div class="post-time">${post.time}</div>
-        <div>${post.text}</div>
-      </div>
-    `;
-  });
-}
-</script>
-<!DOCTYPE html>
-<html>
-<head>
-  <title>Sindhi Social</title>
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
-
-<h1>❤️ Sindhi Social</h1>
-<p>سنڌي ماڻهن لاءِ سوشل ڪميونٽي</p>
-
-<a href="login.html">Login</a> |
-<a href="register.html">Register</a>
-
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title> </title>
-</head>
-<body>
-
-<h3 style="text-align:center;margin-top:50px;">
-</h3>
-
-</script>
-<!DOCTYPE html>
 <html lang="sd">
 <head>
   <meta charset="UTF-8">
   <title>Sindhi Social</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<!-- HEADER -->
+<!-- ===== HEADER ===== -->
 <header class="header">
   <div class="left">
-    <img id="profilePic" src="default.png" alt="Profile">
+    <!-- Profile Picture -->
+    <img id="profilePic" src="default.png" alt="Profile Picture">
     <input type="file" id="imageInput" accept="image/*" hidden>
   </div>
 
@@ -235,19 +21,35 @@ function loadPosts() {
     <p>سنڌي ماڻهن لاءِ سوشل ڪميونٽي</p>
   </div>
 
-  <div class="right">🔔</div>
+  <div class="right">
+    🔔
+  </div>
 </header>
 
-<!-- CREATE POST -->
+<!-- ===== CREATE POST ===== -->
 <div class="create-post">
   <textarea id="postText" placeholder="اڄ ڇا شيئر ڪرڻ چاهيو ٿا؟"></textarea>
   <button onclick="addPost()">Post</button>
 </div>
 
-<!-- FEED -->
-<div id="feed"></div>
+<!-- ===== FEED ===== -->
+<div id="feed">
 
-<!-- BOTTOM NAV -->
+  <!-- Example Post -->
+  <div class="post">
+    <div class="post-header">Nizam Uddin</div>
+    <div class="post-time">12/25/2025, 8:38 PM</div>
+    <p>سنڌي ٻولي اسان جي سڃاڻپ آهي ❤️</p>
+    <div class="actions">
+      <span>❤️ Like</span>
+      <span>💬 Comment</span>
+      <span>🔁 Share</span>
+    </div>
+  </div>
+
+</div>
+
+<!-- ===== BOTTOM NAV ===== -->
 <nav class="bottom-nav">
   <span>🏠</span>
   <span>🔍</span>
@@ -256,17 +58,8 @@ function loadPosts() {
   <span>👤</span>
 </nav>
 
+<!-- ===== SCRIPT ===== -->
 <script src="script.js"></script>
-</body>
-</html>
 
 </body>
 </html>
-
-</html>
-
-
-
-
-
-
